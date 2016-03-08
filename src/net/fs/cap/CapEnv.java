@@ -3,16 +3,8 @@
 package net.fs.cap;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.net.*;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.fs.rudp.Route;
@@ -36,6 +28,7 @@ import org.pcap4j.packet.IpV4Packet.IpV4Header;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.TcpPacket;
 import org.pcap4j.packet.TcpPacket.TcpHeader;
+import org.pcap4j.util.LinkLayerAddress;
 import org.pcap4j.util.MacAddress;
 
 
@@ -280,8 +273,16 @@ public class CapEnv {
 								EthernetHeader head_eth=packet_eth.getHeader();
 								
 								if(head_eth.getType().value()==0xffff8864){
-									ppp=true;
-									PacketUtils.ppp=ppp;
+									Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
+									while (nis.hasMoreElements()) {
+										NetworkInterface ni = nis.nextElement();
+										byte[] mac = ni.getHardwareAddress();
+										if (Arrays.equals(mac, head_eth.getDstAddr().getAddress())) {
+											ppp = true;
+											PacketUtils.ppp = ppp;
+											break;
+										}
+									}
 								}
 								
 								IpV4Packet ipV4Packet=null;
