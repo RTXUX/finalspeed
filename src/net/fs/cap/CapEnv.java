@@ -273,13 +273,22 @@ public class CapEnv {
 								EthernetHeader head_eth=packet_eth.getHeader();
 								
 								if(head_eth.getType().value()==0xffff8864){
-									Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
+									/*Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
 									while (nis.hasMoreElements()) {
 										NetworkInterface ni = nis.nextElement();
 										byte[] mac = ni.getHardwareAddress();
 										if (Arrays.equals(mac, head_eth.getDstAddr().getAddress())) {
 											ppp = true;
 											PacketUtils.ppp = ppp;
+											break;
+										}
+									}*/
+									for (LinkLayerAddress lla:pi.getLinkLayerAddresses())
+									{
+										if (Arrays.equals(lla.getAddress(),head_eth.getDstAddr().getAddress()))
+										{
+											ppp=true;
+											PacketUtils.ppp=ppp;
 											break;
 										}
 									}
